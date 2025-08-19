@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Perpustakaan Sederhana</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f2f2f2; }
+    form { margin-bottom: 20px; }
+    input[type="text"], input[type="number"] { padding: 5px; margin-right: 10px; }
+    button { padding: 5px 10px; }
+  </style>
+</head>
+<body>
+  <h1>Perpustakaan Sederhana</h1>
+  <form id="bookForm">
+    <input type="hidden" id="bookId">
+    <input type="text" id="title" placeholder="Judul" required>
+    <input type="text" id="author" placeholder="Penulis" required>
+    <input type="number" id="year" placeholder="Tahun" required>
+    <button type="submit">Tambah / Update Buku</button>
+  </form>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Judul</th><th>Penulis</th><th>Tahun</th><th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="booksTable"></tbody>
+  </table>
+  <script>
+    async function fetchBooks() {
+      const res = await fetch('/api/books');
+      const books = await res.json();
+      const table = document.getElementById('booksTable');
+      table.innerHTML = '';
+      books.forEach(book => {
+        table.innerHTML += `
+          <tr>
+            <td>${book.id}</td>
+            <td>${book.title}</td>
+            <td>${book.author}</td>
+            <td>${book.year}</td>
+            <td>
+              <button onclick="editBook(${book.id})">Edit</button>
+              <button onclick="deleteBook(${book.id})">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById('bookForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('bookId').value;
+      const title = document.getElementById('title').value;
+      const author = document.getElementById('author').value;
+      const year = document.getElementById('year').value;
+      if (id) {
+        await fetch('/api/books/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, author, year })
+        });
+      } else {
+        await fetch('/api/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, author, year })
+        });
+      }
+      this.reset();
+      fetchBooks();
+    };
+
+    async function editBook(id) {
+      const res = await fetch('/api/books/' + id);
+      const book = await res.json();
+      document.getElementById('bookId').value = book.id;
+      document.getElementById('title').value = book.title;
+      document.getElementById('author').value = book.author;
+      document.getElementById('year').value = book.year;
+    }
+
+    async function deleteBook(id) {
+      await fetch('/api/books/' + id, { method: 'DELETE' });
+      fetchBooks();
+    }
+
+    fetchBooks();
+  </script>
+</body>
+</html>
