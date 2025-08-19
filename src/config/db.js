@@ -2,9 +2,9 @@ const mysql = require('mysql2');
 
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root',      // user default Laragon
-  password: '',      // password default Laragon (kosong)
-  database: 'perpustakaan' // nama database yang barusan dibuat
+  user: 'root',      
+  password: '',      
+  database: 'perpustakaan' 
 });
 
 db.connect((err) => {
@@ -12,7 +12,7 @@ db.connect((err) => {
   console.log('Connected to MySQL (Laragon)');
 });
 
-// Membuat tabel jika belum ada
+
 db.query(`
   CREATE TABLE IF NOT EXISTS books (
     id INT AUTO_INCREMENT PRIMARY KEY,

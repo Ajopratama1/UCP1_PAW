@@ -7,7 +7,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(bodyParser.json());
-app.use(express.static('public')); // untuk file UI
+app.use(express.static('public')); 
 
 app.use('/api/books', libraryRoutes);
 
